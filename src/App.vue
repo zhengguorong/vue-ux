@@ -30,7 +30,7 @@ export default {
     onPlay() {
       this.paused = false;
       this.reverse = false;
-      this.moment = null;
+      this.moment = 0;
     },
     onPause() {
       this.paused = true;

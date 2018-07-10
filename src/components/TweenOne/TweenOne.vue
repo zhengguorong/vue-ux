@@ -53,7 +53,7 @@ export default {
 
         // 动画处理
         const newAnimation = nextProps.animation;
-        const currentAnimation = this.originProps.animation;
+        const currentAnimation = this.$props.animation;
         const equal = objectEqual(currentAnimation, newAnimation);
         if (!equal) {
           this.setDefalut(nextProps);
@@ -64,7 +64,7 @@ export default {
         const nextMoment = nextProps.moment;
         if (
           typeof nextMoment === "number" &&
-          nextMoment !== this.originProps.moment
+          nextMoment !== this.$props.moment
         ) {
           if (this.tween && !this.updateAnim) {
             this.startMoment = nextMoment;
@@ -105,7 +105,7 @@ export default {
           }
         }
 
-        const styleEqual = objectEqual(this.originProps.style, nextProps.style);
+        const styleEqual = objectEqual(this.$props.style, nextProps.style);
         if (!styleEqual) {
           // 在动画时更改了 style, 作为更改开始数值。
           if (this.tween) {

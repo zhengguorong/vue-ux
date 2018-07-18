@@ -1,5 +1,5 @@
 <script>
-import { dataToArray, objectEqual } from "./util";
+import { dataToArray, objectEqual, clone } from "./util";
 import Tween from "./Tween";
 import ticker from "./ticker";
 
@@ -9,6 +9,7 @@ const perFrame = Math.round(1000 / 60);
 export default {
   props: {
     animation: [Object, Array],
+    forcedJudg: [Object],
     css: [Object],
     paused: [Boolean],
     reverse: [Boolean],
@@ -18,9 +19,7 @@ export default {
     component: {
       default: "div"
     },
-    componentProps: {
-      default: () => {}
-    },
+    componentProps: {},
     reverseDelay: {
       type: Number,
       default: 0
@@ -46,14 +45,14 @@ export default {
     $props: {
       deep: true,
       handler(nextProps) {
+        nextProps.moment = nextProps.time
         if (!this.tween && !this.dom) {
           this.updateAnim = true;
           return;
         }
-
         // 动画处理
         const newAnimation = nextProps.animation;
-        const currentAnimation = this.$props.animation;
+        const currentAnimation = this.originProps.animation;
         const equal = objectEqual(currentAnimation, newAnimation);
         if (!equal) {
           this.setDefalut(nextProps);
@@ -64,7 +63,7 @@ export default {
         const nextMoment = nextProps.moment;
         if (
           typeof nextMoment === "number" &&
-          nextMoment !== this.$props.moment
+          nextMoment !== this.originProps.moment
         ) {
           if (this.tween && !this.updateAnim) {
             this.startMoment = nextMoment;
@@ -83,14 +82,14 @@ export default {
 
         // 暂停倒放
         if (
-          this.paused !== nextProps.paused ||
-          this.reverse !== nextProps.reverse
+          this.originProps.paused !== nextProps.paused ||
+          this.originProps.reverse !== nextProps.reverse
         ) {
-          this.paused = nextProps.paused;
-          this.reverse = nextProps.reverse;
-          if (this.paused) {
+          this.originProps.paused = nextProps.paused;
+          this.originProps.reverse = nextProps.reverse;
+          if (this.originProps.paused) {
             this.cancelRequestAnimationFrame();
-          } else if (this.reverse && nextProps.reverseDelay) {
+          } else if (this.originProps.reverse && nextProps.reverseDelay) {
             this.cancelRequestAnimationFrame();
             ticker.timeout(this.restart, nextProps.reverseDelay);
           } else {
@@ -105,14 +104,15 @@ export default {
           }
         }
 
-        const styleEqual = objectEqual(this.$props.style, nextProps.style);
+        const styleEqual = objectEqual(this.originProps.style, nextProps.style);
         if (!styleEqual) {
           // 在动画时更改了 style, 作为更改开始数值。
           if (this.tween) {
-            this.tween.reStart(this.$props.style);
+            this.tween.reStart(this.originProps.style);
           }
         }
         this.setForcedJudg(nextProps);
+        this.originProps = clone(nextProps)
       }
     }
   },
@@ -139,6 +139,16 @@ export default {
         // 开始动画
         this.play();
       }
+    },
+    restart() {
+      if (!this.tween) {
+        return;
+      }
+      this.startMoment = this.moment;
+      this.startFrame = ticker.frame;
+      this.tween.reverse = this.reverse;
+      this.tween.reverseStartTime = this.startMoment;
+      this.play();
     },
     frame() {
       const { yoyo } = this.$props;
@@ -247,12 +257,6 @@ export default {
           }
         });
       }
-    },
-    _deepClone (obj) {
-      let _tmp,result;
-      _tmp = JSON.stringify(obj);
-      result = JSON.parse(_tmp);
-      return result;
     }
   },
   update() {
@@ -269,7 +273,8 @@ export default {
   },
   mounted() {
     this.dom = this.$el;
-    this.originProps = this._deepClone(this.$props)
+    this.$props.moment = this.$props.time
+    this.originProps = clone(this.$props)
     this.init(this.$props);
     if (this.dom && this.dom.nodeName !== "#text") {
       this.start();
@@ -313,10 +318,7 @@ export default {
         : className;
       return createElement(this.props.children, { style: newStyle, className: newClassName });
     }
-    return createElement(this.$props.component, {
-      ...props,
-      ...this.$props.componentProps
-    });
+    return createElement(this.$props.component, {...props}, this.$props.componentProps);
   }
 };
 </script>

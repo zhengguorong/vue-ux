@@ -1,51 +1,30 @@
-<template>
-  <div>
-    <ul>
-      <li>{{number}}</li>
-      <li>{{number}}</li>
-      <li>{{number}}</li>
-      <li>{{number}}</li>
-      <li>{{number}}</li>
-      <li>{{number}}</li>
-    </ul>
-    <button @click="start">play</button>
-  </div>
-</template>
-
 <script>
-import TWEEN from '@tweenjs/tween.js'
 export default {
+  props: ['test'],
+  mounted () {
+    setTimeout(() => {
+      console.log('change Data')
+      // this.myObj = {a: 3333, b: 666}
+      // this.myData.a = 'hhhh'
+      this.$set(this.myObj, 'a', 'hhhh')
+    }, 1000);
+  },
   data() {
     return {
-      number: 0 
+      myData: '23333',
+      myObj: {
+        a: 123,
+        b: 456
+      }
     }
   },
-  methods: {
-    start () {
-      function animate () {
-        if (TWEEN.update()) {
-          requestAnimationFrame(animate)
-        }
-      }
-      new TWEEN.Tween(this.$data).to({number: 10}, 300).start()
-      animate()
-    }
+  render (createElement) {
+    console.log('render')
+    console.log(this.$props.test)
+    console.log(this.myObj.a)
+    let tag = createElement('li', this.$props.test)
+    return createElement('li', {style: {color: '#000'}}, [tag])
   }
 }
 </script>
 
-
-<style scoped>
-  ul {
-    margin: 0;
-    padding: 0;
-  }
-  li {
-    list-style-type: none;
-    text-align: center;
-    height: 30px;
-    line-height: 30px;
-    background: #ccc;
-    border-bottom: 1px solid #fff;
-  }
-</style>

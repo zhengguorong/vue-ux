@@ -76,7 +76,7 @@ export default {
     };
   },
   watch: {
-    $props: {
+    $slots: {
       deep: true,
       handler(nextProps) {
         this.componentWillReceiveProps(nextProps)
@@ -466,12 +466,11 @@ export default {
       this.originalChildren = this.$slots.default;
       const keysToEnter = [...this.keysToEnter];
       const keysToLeave = [...this.keysToLeave];
-      console.log(keysToLeave, 'keysToLeave')
       keysToEnter.forEach(this.performEnter);
       keysToLeave.forEach(this.performLeave);
     },
     componentWillReceiveProps(nextProps) {
-      console.log('componentWillReceiveProps')
+      console.log(nextProps, 'componentWillReceiveProps')
       const nextChildren = this.$slots.default.filter(item => item);
       let currentChildren = this.originalChildren.filter(item => item);
       if (this.children.length) {
@@ -490,6 +489,7 @@ export default {
          * 所以这里需要处理出场完成的元素做清除。
          */
         const stateChildrens = mergeChildren(currentChildren, this.children);
+        console.log(stateChildrens, 'stateChildrens')
         const currentChild = [];
         const childReOrder = child => {
           child.forEach(item => {
@@ -507,6 +507,9 @@ export default {
         currentChildren = currentChild.filter(c => c);
       }
       const newChildren = mergeChildren(currentChildren, nextChildren);
+      console.log(currentChildren, 'currentChildren')
+      console.log(nextChildren, 'nextChildren')
+      console.log(newChildren, 'newChildren')
 
       const childrenShow = !newChildren.length ? {} : this.childrenShow;
       this.keysToEnterPaused = {};
@@ -571,7 +574,10 @@ export default {
     this.keysToLeave = [];
   },
   updated() {
-    this.componentWillReceiveProps()
+    // 因为没法监听slot变化，这里hack一下，判断是否slot改变了
+    if (this.$slots.default !== this.originalChildren) {
+      this.componentWillReceiveProps()
+    }
     console.log("update");
     this.update();
   },
@@ -603,7 +609,7 @@ export default {
       "appear"
     ].forEach(key => delete tagProps[key]);
     const childrenToRender =
-      this.$slots.default && this.$slots.default.map(this.getChildrenToRender);
+      this.children && this.children.length > 0 && this.children.map(this.getChildrenToRender);
     const props = { ...tagProps, ...this.$props.componentProps };
     return createElement(this.$props.component, props, childrenToRender);
   }

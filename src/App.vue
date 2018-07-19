@@ -9,13 +9,13 @@
       :animation=animation
       class="code-box-shape">
     </TweenOne> -->
-    <QueueAnim :forcedReplay="forcedReplay" :interval=100 :duration=3000>
+    <QueueAnim :forcedReplay="forcedReplay" :interval=100 :duration=1000>
         <li>no key</li>
         <li v-for="item in items" :key="item.key">{{item.children}}</li>
     </QueueAnim>
     <button @click="removeAll">移出所有</button>
     <button @click="add">add</button>
-    <button @click="update">update</button>
+    <button @click="pop">pop</button>
     <button @click="addOne">addOne</button>
     <!-- <List :test="test"></List>
     <button @click="changeTest">changeTest</button> -->
@@ -38,30 +38,30 @@ export default {
       moment: null,
       reverseDelay: 0,
       items: [
-        // {
-        //   children: "依次进入1",
-        //   key: 1
-        // },
-        // {
-        //   children: "依次进入2",
-        //   key: 2
-        // },
-        // {
-        //   children: "依次进入3",
-        //   key: 3
-        // },
-        // {
-        //   children: "依次进入4",
-        //   key: 4
-        // },
-        // {
-        //   children: "依次进入5",
-        //   key: 5
-        // },
-        // {
-        //   children: "依次进入6",
-        //   key: 6
-        // }
+        {
+          children: "依次进入1",
+          key: 1
+        },
+        {
+          children: "依次进入2",
+          key: 2
+        },
+        {
+          children: "依次进入3",
+          key: 3
+        },
+        {
+          children: "依次进入4",
+          key: 4
+        },
+        {
+          children: "依次进入5",
+          key: 5
+        },
+        {
+          children: "依次进入6",
+          key: 6
+        }
       ]
     };
   },
@@ -72,8 +72,8 @@ export default {
     removeAll() {
       this.items = [];
     },
-    update() {
-      this.forcedReplay = true;
+    pop () {
+      this.items.pop()
     },
     animConfigFunc(e) {
       if (e.key === 3) {

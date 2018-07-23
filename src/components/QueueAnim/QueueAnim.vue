@@ -357,6 +357,7 @@ export default {
     },
 
     leaveBegin(key, e) {
+      console.log('leaveBegin')
       const elem = e.target;
       const animatingClassName = this.$props.animatingClassName;
       elem.className = elem.className.replace(animatingClassName[0], "");
@@ -471,7 +472,7 @@ export default {
     },
     componentWillReceiveProps(nextProps) {
       console.log(nextProps, 'componentWillReceiveProps')
-      const nextChildren = this.$slots.default.filter(item => item);
+      const nextChildren = this.$slots.default && this.$slots.default.filter(item => item) || [];
       let currentChildren = this.originalChildren.filter(item => item);
       if (this.children.length) {
         /**
@@ -506,10 +507,12 @@ export default {
         childReOrder(currentChildren);
         currentChildren = currentChild.filter(c => c);
       }
+      console.log(currentChildren.length, 'currentChildren.length')
+      console.log(nextChildren.length, 'nextChildren.length')
       const newChildren = mergeChildren(currentChildren, nextChildren);
+      console.log(newChildren, 'newChildren')
       console.log(currentChildren, 'currentChildren')
       console.log(nextChildren, 'nextChildren')
-      console.log(newChildren, 'newChildren')
 
       const childrenShow = !newChildren.length ? {} : this.childrenShow;
       this.keysToEnterPaused = {};
@@ -552,7 +555,6 @@ export default {
           this.keysToEnter.push(key);
         }
       });
-
       currentChildren.forEach(c => {
         if (!c) {
           return;
@@ -564,6 +566,7 @@ export default {
         }
       });
       this.keysToEnterToCallback = [...this.keysToEnter];
+      console.log(this.keysToLeave, 'keysToLeave')
     }
   },
   destroyed() {
@@ -610,6 +613,7 @@ export default {
     ].forEach(key => delete tagProps[key]);
     const childrenToRender =
       this.children && this.children.length > 0 && this.children.map(this.getChildrenToRender);
+    console.log(childrenToRender, 'childrenToRender')
     const props = { ...tagProps, ...this.$props.componentProps };
     return createElement(this.$props.component, props, childrenToRender);
   }

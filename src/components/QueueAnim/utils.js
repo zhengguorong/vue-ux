@@ -23,6 +23,8 @@ export function findChildInChildrenByKey(children, key) {
 }
 
 export function mergeChildren(prev, next) {
+  console.log(prev, 'prev')
+  console.log(next, 'next')
   let ret = [];
   // For each key of `next`, the list of keys to insert before that key in
   // the combined list

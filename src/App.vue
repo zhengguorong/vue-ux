@@ -10,7 +10,6 @@
       class="code-box-shape">
     </TweenOne> -->
     <QueueAnim :forcedReplay="forcedReplay" :interval=100 :duration=1000>
-        <li>no key</li>
         <li v-for="item in items" :key="item.key">{{item.children}}</li>
     </QueueAnim>
     <button @click="removeAll">移出所有</button>
